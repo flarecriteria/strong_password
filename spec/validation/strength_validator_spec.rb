@@ -25,6 +25,10 @@ class TestBaseStrengthAlternative < User
   validates_password_strength :password
 end
 
+class TestAllowNil < User
+  validates :password, password_strength: { allow_nil: true }
+end
+
 module ActiveModel
   module Validations
     describe PasswordStrengthValidator do
@@ -33,6 +37,7 @@ module ActiveModel
       let(:strong_entropy) { TestStrengthStrongEntropy.new }
       let(:extra_words) { TestStrengthExtraWords.new }
       let(:alternative_usage) { TestBaseStrengthAlternative.new }
+      let(:allow_nil) { TestAllowNil.new }
 
       describe 'validations' do
         describe 'base strength' do
@@ -147,6 +152,17 @@ module ActiveModel
             # in our model, the same password is considered weak.
             extra_words.password = password
             expect(extra_words.valid?).to be_falsey
+          end
+        end
+
+        describe 'allow nil password' do
+          it 'allows nil to pass the validation' do 
+            # Nil password word should pass
+            allow_nil.password = nil
+            expect(allow_nil.valid?).to be_truthy
+            # Weak passwords still fail
+            allow_nil.password = '1234'
+            expect(allow_nil.valid?).to be_falsey
           end
         end
       end

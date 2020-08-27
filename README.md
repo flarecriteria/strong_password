@@ -58,6 +58,11 @@ class User
   # Alternative way to request password strength validation on a field
   validates_password_strength :password
 
+  # Often, such as with, Devise, your password is only in the ActiveModel until
+  # it is stored in the database in an encrypted field. Use allow_nil in these cases
+  # so the validator will not prevent your user model from being saved.
+  validates :password, password_strength: { allow_nil: true }
+
   # Return an array of words to add to the dictionary we check against.
   def my_extra_words
     ['extra', 'words', 'here', 'too']
